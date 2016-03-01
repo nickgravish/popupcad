@@ -163,6 +163,7 @@ class ConstraintSystem(object):
             pass
         
     def update(self):
+        print("Updating now!")
         if not self.generator.empty:
             dq = self.generator.dq
             variables = self.generator.variables
