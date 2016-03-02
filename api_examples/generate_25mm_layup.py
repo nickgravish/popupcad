@@ -2,17 +2,13 @@
 """
 Please see LICENSE for full license.
 """
-from shapely import coords
-from sympy.printing import lambdarepr
 
 import popupcad
 from popupcad.filetypes.sketch import Sketch
 import numpy as np
 import sys
 
-import qt.QtCore as qc
 import qt.QtGui as qg
-from popupcad_manufacturing_plugins.manufacturing.outersheet3 import OuterSheet3
 from popupcad.filetypes.material2 import default_material_types
 
 if __name__=='__main__':
@@ -144,9 +140,9 @@ if __name__=='__main__':
     window_coords = np.array([round(kk*(1 + space_x)*window_width,4) for kk in range(len(windows))])
     window_coords = list(window_coords - np.mean(window_coords)) # center is 0
 
-    for kk, (layer, window, x_coord) in enumerate(zip(top_design.return_layer_definition().layers[:-1],
-                                                      windows[:-1],
-                                                      window_coords[:-1])):
+    for kk, (layer, window, x_coord) in enumerate(zip(top_design.return_layer_definition().layers,
+                                                      windows,
+                                                      window_coords)):
 
         window.name = layer.name + '_window'
 
@@ -167,7 +163,7 @@ if __name__=='__main__':
     # laminate operation to remove windows from sheet with holes
     sheet_with_windows = popupcad.manufacturing.laminateoperation2.LaminateOperation2({'unary': [(sheet_with_holes.id,0)],
                                                                                      'binary': [(sktch.id,0) for sktch
-                                                                                                in windows_sketchop[:-1]]},
+                                                                                                in windows_sketchop]},
                                                                                      'difference')
     sheet_with_windows.name = "Final sheet"
 
