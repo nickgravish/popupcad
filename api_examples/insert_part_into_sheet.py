@@ -11,6 +11,7 @@ Please see LICENSE for full license.
 import popupcad
 import os
 import sys
+import math
 # import api_examples
 
 import qt.QtGui as qg
@@ -25,65 +26,12 @@ from popupcad.filetypes.genericshapes import GenericLine
 from popupcad.manufacturing.transform_external import TransformExternal
 from popupcad.manufacturing.laminateoperation2 import LaminateOperation2
 
+
+
 # file to load and work with
 myfolder  = '/Users/nickgravish/popupCAD_files/designs/'
 myfile2    = 'robobee_interference_hinge_BAK.cad' #'test_geom.cad'
 myfile    =  '9layer_25x25.cad' #'25mm_x_25mm_layup.cad'
-
-
-
-
-
-def web_for_construction(op, outer_buffer = 1, support_gap = 0.25):
-    """
-
-    Parameters
-    ----------
-    op -> design file to create web from
-
-    defaults for the web generation
-
-    Returns
-    -------
-    sheet_out, outer_web, inner_elements, buffered_keepout
-    laminates from the web generation function
-    """
-
-
-# generate a construction line associated with the left line of the web of the part
-def add_construction(part, operation_ref = False):
-    """
-    This code takes in a design file and adds a construction line to the left vertical side of the bounding
-    box of the laminate in the operation_ref operation. By default the operation_ref will grab the last operation
-    assuming that this is final laminate operation that created the part
-    Parameters
-    ----------
-    part -> a design file with
-    operation_ref -> Reference to the operation that the construction geometry will be referencing
-
-    Returns
-    -------
-    construction_line -> the geometry of the construction line for use with the transform op
-
-    """
-
-    # default to the last operation
-    if not operation_ref:
-        op = part.operations[-1]
-    else:
-        op = part.operations[operation_ref]
-
-
-
-    construction_line = []
-    return construction_line
-
-
-
-
-# remove the web.sheet from the sheet and make hole
-
-# Union the transform, the web, and the hole
 
 
 if __name__=='__main__':
@@ -147,9 +95,55 @@ if __name__=='__main__':
     position_hinge = (-tmp_geom[0][0],-tmp_geom[0][1])
     tmp_geom = [(x + position_hinge[0], y + position_hinge[1]) for (x,y) in tmp_geom]
 
+    # two locations to place parts, upper and lower "windows"
+    parts_bounding_box = (15, 9.5) # width, height
+
+    # lets make 4x4
+    sc = 2;
+    x_gap = 0
+    y_gap = 0
+    width = (bounding_box[2] - bounding_box[0])/sc + x_gap
+    height = (bounding_box[3] - bounding_box[1])/sc + y_gap
+
+    # number of parts
+    N = 80
+
+    # check if will all fit in one window, if not fill first and check if remainder will fit in second window
+    max_num_cols = divmod(parts_bounding_box[0], width)[0]
+    max_num_rows = divmod(parts_bounding_box[1], height)[0]
+
+    arrayed_reference_lines = []
+
+    # check if can fit in one
+    # if N <= max_num_rows*max_num_cols:
+    rows = math.ceil(N / max_num_cols)
+    cols = math.ceil(N / rows)          # spread across the two windows
+    n_count = 0
+
+    new_center = (-parts_bounding_box[0]/2, 2)
+    tmp_geom = [(x + new_center[0], y + new_center[1]) for (x,y) in tmp_geom]
+
+    for row in range(rows):
+        for col in range(cols):
+            if n_count > N or n_count > max_num_rows*max_num_cols*2:
+                break
+
+            if row < max_num_rows:
+                arrayed_reference_lines.append([(tmp_geom[0][0]+col*width, tmp_geom[0][1]/sc+(max_num_rows-row - 1)*height),
+                                                (tmp_geom[1][0]+col*width, tmp_geom[1][1]/sc+(max_num_rows-row - 1)*height)])
+
+            else:
+                arrayed_reference_lines.append([(tmp_geom[0][0]+col*width,
+                                                 tmp_geom[0][1]/sc+(max_num_rows-row - 1)*height - 2*new_center[1]),
+                                                (tmp_geom[1][0]+col*width,
+                                                 tmp_geom[1][1]/sc+(max_num_rows-row - 1)*height - 2*new_center[1])])
+
+            n_count = n_count + 1
+
     construction_geom_sheet = Sketch.new()
-    construction_line = GenericLine.gen_from_point_lists(tmp_geom,[],construction=False)
-    construction_geom_sheet.addoperationgeometries([construction_line])
+    construction_line = [GenericLine.gen_from_point_lists(line,[],construction=False) for
+                         line in arrayed_reference_lines]
+    construction_geom_sheet.addoperationgeometries(construction_line)
 
     # add sketch to sketch list
     sheet.sketches[construction_geom_sheet.id] = construction_geom_sheet
@@ -217,7 +211,6 @@ if __name__=='__main__':
     sheet_with_part.generate(sheet)
 
     ######################## Make release cut laminate operation
-    # release cut is second to last layer
 
     # # make design links
     design_links = {}
@@ -234,7 +227,6 @@ if __name__=='__main__':
     insert_release.customname = 'Release'
     sheet.addoperation(insert_release)
     insert_release.generate(sheet)
-
 
     ################## show the new design
 
