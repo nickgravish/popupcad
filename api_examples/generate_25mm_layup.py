@@ -16,7 +16,7 @@ if __name__=='__main__':
     app = qg.QApplication(sys.argv)
 
     sheet_width = 25        # mm
-    hole_offset = 3
+    hole_offset = 3         # location of hole in from corner
     hole_rad    = 0.79      # alignment pin geoms
     cross_len   = 1         # tick length
     cross_horiz = 10        # horizontal dimension from center crosshair

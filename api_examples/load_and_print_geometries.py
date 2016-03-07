@@ -2,12 +2,11 @@
 """
 Please see LICENSE for full license.
 """
-from nbformat.v2.nbbase import new_author
 
 import popupcad
 import os
 import sys
-import api_examples
+# import api_examples
 
 import qt.QtGui as qg
 
