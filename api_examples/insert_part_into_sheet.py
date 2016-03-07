@@ -48,8 +48,8 @@ if __name__=='__main__':
     hinge.reprocessoperations(debugprint=True)
 
     # get hinge op id
-    insert_part_operation_number = len(hinge.operations)-1
-    release_cut_operation_number = len(hinge.operations)-2
+    insert_part_operation_number = len(hinge.operations)-2
+    release_cut_operation_number = len(hinge.operations)-1
 
     support_offset = 0.1
 
@@ -99,14 +99,14 @@ if __name__=='__main__':
     parts_bounding_box = (15, 9.5) # width, height
 
     # lets make 4x4
-    sc = 2;
+    sc = 1
     x_gap = 0
     y_gap = 0
     width = (bounding_box[2] - bounding_box[0])/sc + x_gap
     height = (bounding_box[3] - bounding_box[1])/sc + y_gap
 
     # number of parts
-    N = 80
+    N = 12
 
     # check if will all fit in one window, if not fill first and check if remainder will fit in second window
     max_num_cols = divmod(parts_bounding_box[0], width)[0]
