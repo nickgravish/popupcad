@@ -41,8 +41,15 @@ hinge_file    = 'robobee_interference_hinge_BAK.cad'
 
 def generate_laminate(design):
     """
-    Take in a design file and generate a support laminate for this part
+    Return a subop of a layup laminate with all the layers of the part and with the appropriate 25x25mm alignment
+    features compatible with the Wood lab micro-robotics manufacturing process.
 
+    Input:
+    Design -> a popupcad design file
+
+    Output:
+    layup -> A handle to the layup design file
+    subop -> A subop which is inserted into the input design file to reduce the number of operations
     """
 
     sheet_width = 25        # mm
@@ -205,7 +212,27 @@ def generate_laminate(design):
 
     return layup, subop
 
-def array_part_into_layup(hinge, sheet, support_offset = 0.0, N = 12, sc = 1, x_gap = 0, y_gap = 0):
+def array_part_into_layup(hinge, sheet, parts_bounding_box = (15, 9.5), support_offset = 0., N = 12, sc = 1., x_gap = 0., y_gap = 0.):
+    """
+    This function takes in a part design file (hinge) and a layup laminate (sheet) and arrays the part file into the
+    laminate to try and maximize the number of parts (N) to cut.
+
+    Parameters
+    ----------
+    hinge -> design file of the part to cut
+    parts_bounding_box -> Tuple containing height and width of upper and lower part "windows"
+    sheet -> the layup sheet to put the part into. This is assumed to be 25x25mm right now
+    support_offset -> the amount of support material around the part
+    N -> Number of parts
+    sc -> scale of the part
+    x_gap -> x gap between parts
+    y_gap -> y gap between parts
+
+    Returns
+    -------
+
+    """
+
 
     # original_sheet_id = sheet.operations[-1].id
 
@@ -255,9 +282,6 @@ def array_part_into_layup(hinge, sheet, support_offset = 0.0, N = 12, sc = 1, x_
     # center the bottom left to origin
     position_hinge = (-tmp_geom[0][0],-tmp_geom[0][1])
     tmp_geom = [(x + position_hinge[0], y + position_hinge[1]) for (x,y) in tmp_geom]
-
-    # two locations to place parts, upper and lower "windows"
-    parts_bounding_box = (15, 9.5) # width, height
 
     # lets make 4x4
     width = (bounding_box[2] - bounding_box[0])/sc + x_gap
@@ -408,8 +432,6 @@ if __name__=='__main__':
 
     # generate laminate based on the layers in the design
     layup, subop = generate_laminate(hinge)
-
-
 
     # place op the laminate
     array_part_into_layup(hinge, subop, N = 24, x_gap = 0.1, y_gap = 0.1)
