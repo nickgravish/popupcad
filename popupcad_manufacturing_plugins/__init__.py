@@ -4,7 +4,7 @@ Written by Daniel M. Aukes and CONTRIBUTORS
 Email: danaukes<at>seas.harvard.edu.
 Please see LICENSE for full license.
 """
-
+from popupcad import manufacturing
 from . import manufacturing
 
 #import external modules
@@ -30,6 +30,8 @@ def build_menu_system(program):
         program.editor.newoperation(manufacturing.identifybodies2.IdentifyBodies2)
     def new_identify_rigid_bodies():
         program.editor.newoperation(manufacturing.identifyrigidbodies2.IdentifyRigidBodies2)
+    def new_alignment_layup():
+        program.editor.newoperation(manufacturing.generatealignmentlayup.AlignmentLayup)
 
     action_definitions = {}
     
@@ -46,17 +48,21 @@ def build_menu_system(program):
     action_definitions['removability']={'text': 'Removability','icon': 'removability'}
     action_definitions['identify_bodies']={'text': 'Identify Bodies','icon': 'identifybodies'}
 
+    action_definitions['alignment_layup']={'text': 'Alignment layup','icon': 'identifybodies'}
+
     toolbar_definitions={}
     toolbar_definitions['Scrap']={'text': 'Scrap', 'icon': 'scrap'}
     toolbar_definitions['Support']={'text': 'Support','icon': 'outerweb'}
     toolbar_definitions['Misc']={'text': 'Misc...','icon': 'dotdotdot'}
+    toolbar_definitions['Microrobotics']={'text': 'Microrobotics','icon': 'dotdotdot'}
 
     menu_structure = {}
-    menu_structure['manufacturing'] = ['Scrap','Support','identify_bodies','Misc']
+    menu_structure['manufacturing'] = ['Scrap','Support','identify_bodies','Misc','Microrobotics']
     menu_structure['top'] = ['manufacturing']
     menu_structure['Scrap'] = ['sheet','web','scrap']
     menu_structure['Support'] = ['support_action','custom_support']
     menu_structure['Misc'] = ['keepout','identify_rigid_bodies','removability']
+    menu_structure['Microrobotics'] = ['alignment_layup']
     
     toolbar_structure = menu_structure.copy()
     shortcuts = {}
@@ -71,6 +77,7 @@ def build_menu_system(program):
     triggered['identify_rigid_bodies'] = new_identify_rigid_bodies
     triggered['removability'] = new_removability
     triggered['identify_bodies'] = new_identify_bodies
+    triggered['alignment_layup'] = new_alignment_layup
 
     for key,value in triggered.items():
         action_definitions[key]['triggered'] = value    

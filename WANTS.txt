@@ -18,3 +18,6 @@ holding shift, orhto
 x,y coord readout
 
 no horizontal panning
+
+Easy distance measurement
+

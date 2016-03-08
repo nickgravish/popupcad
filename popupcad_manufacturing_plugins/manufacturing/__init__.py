@@ -21,6 +21,7 @@ from . import outersheet3
 from . import removability2
 from . import scrapoperation2
 from . import supportcandidate4
+from . import generatealignmentlayup
 #from . import identifyrigidbodies
 #from . import supportcandidate3
 #from . import toolclearance2

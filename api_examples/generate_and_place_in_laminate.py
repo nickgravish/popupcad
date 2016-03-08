@@ -37,7 +37,7 @@ plugins.append(popupcad_manufacturing_plugins)
 
 # file to load and work with
 myfolder  = '/Users/nickgravish/popupCAD_files/designs/'
-hinge_file    = 'robobee_interference_hinge_BAK.cad'
+hinge_file    =  'Transmissions.cad' #'robobee_interference_hinge_BAK.cad'
 
 def generate_laminate(design):
     """
@@ -70,7 +70,7 @@ def generate_laminate(design):
     # the laminate design
     layup = popupcad.filetypes.design.Design.new()
     layup.updatefilename("layup")
-    layer_list = hinge.return_layer_definition().layers
+    layer_list = design.return_layer_definition().layers
     layup.define_layers(popupcad.filetypes.layerdef.LayerDef(*layer_list))
 
 
@@ -284,8 +284,8 @@ def array_part_into_layup(hinge, sheet, parts_bounding_box = (15, 9.5), support_
     tmp_geom = [(x + position_hinge[0], y + position_hinge[1]) for (x,y) in tmp_geom]
 
     # lets make 4x4
-    width = (bounding_box[2] - bounding_box[0])/sc + x_gap
-    height = (bounding_box[3] - bounding_box[1])/sc + y_gap
+    width = (bounding_box[2] - bounding_box[0])*sc + x_gap
+    height = (bounding_box[3] - bounding_box[1])*sc + y_gap
 
 
     # check if will all fit in one window, if not fill first and check if remainder will fit in second window
@@ -305,18 +305,18 @@ def array_part_into_layup(hinge, sheet, parts_bounding_box = (15, 9.5), support_
 
     for row in range(rows):
         for col in range(cols):
-            if n_count > N or n_count > max_num_rows*max_num_cols*2:
+            if n_count >= N or n_count >= max_num_rows*max_num_cols*2:
                 break
 
             if row < max_num_rows:
-                arrayed_reference_lines.append([(tmp_geom[0][0]+col*width, tmp_geom[0][1]/sc+(max_num_rows-row - 1)*height),
-                                                (tmp_geom[1][0]+col*width, tmp_geom[1][1]/sc+(max_num_rows-row - 1)*height)])
+                arrayed_reference_lines.append([(tmp_geom[0][0]+col*width, tmp_geom[0][1]*sc+(max_num_rows-row - 1)*height),
+                                                (tmp_geom[1][0]+col*width, tmp_geom[1][1]*sc+(max_num_rows-row - 1)*height)])
 
             else:
                 arrayed_reference_lines.append([(tmp_geom[0][0]+col*width,
-                                                 tmp_geom[0][1]/sc+(max_num_rows-row - 1)*height - 2*new_center[1]),
+                                                 tmp_geom[0][1]*sc+(max_num_rows-row - 1)*height - 2*new_center[1]),
                                                 (tmp_geom[1][0]+col*width,
-                                                 tmp_geom[1][1]/sc+(max_num_rows-row - 1)*height - 2*new_center[1])])
+                                                 tmp_geom[1][1]*sc+(max_num_rows-row - 1)*height - 2*new_center[1])])
 
             n_count = n_count + 1
 
@@ -434,7 +434,7 @@ if __name__=='__main__':
     layup, subop = generate_laminate(hinge)
 
     # place op the laminate
-    array_part_into_layup(hinge, subop, N = 24, x_gap = 0.1, y_gap = 0.1)
+    array_part_into_layup(hinge, subop, N = 24, x_gap = 0.1, y_gap = 0.1, sc = 0.5)
 
     ################## show the new design
     editor = popupcad.guis.editor.Editor()
