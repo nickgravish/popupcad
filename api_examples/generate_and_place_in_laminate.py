@@ -27,7 +27,7 @@ from popupcad.manufacturing.transform_external import TransformExternal
 from popupcad.manufacturing.transform_internal import TransformInternal
 from popupcad.manufacturing.laminateoperation2 import LaminateOperation2
 from popupcad.manufacturing.sub_operation2 import SubOperation2
-
+from popupcad.manufacturing.multivalueoperation3 import MultiValueOperation3
 from popupcad.filetypes.material2 import default_material_types
 
 plugins = []
@@ -198,8 +198,7 @@ def generate_laminate(design):
     return layup
 
 
-
-def array_part_into_layup(hinge, sheet, support_offset = 0.1, N = 12, sc = 1, x_gap = 0, y_gap = 0):
+def array_part_into_layup(hinge, sheet, support_offset = 0.0, N = 12, sc = 1, x_gap = 0, y_gap = 0):
 
     # original_sheet_id = sheet.operations[-1].id
 
@@ -215,7 +214,7 @@ def array_part_into_layup(hinge, sheet, support_offset = 0.1, N = 12, sc = 1, x_
     op_ref = op.id
     op_links = {'parent': [(op_ref, op.getoutputref())]}
 
-    new_web = AutoWeb4(op_links,[support_offset,0],popupcad.manufacturing.multivalueoperation3.MultiValueOperation3.keepout_types.laser_keepout)
+    new_web = AutoWeb4(op_links,[support_offset,0],MultiValueOperation3.keepout_types.laser_keepout)
     new_web.setcustomname(op.name)
 
     hinge.addoperation(new_web)
@@ -327,30 +326,47 @@ def array_part_into_layup(hinge, sheet, support_offset = 0.1, N = 12, sc = 1, x_
     insert_part.generate(hinge)
     insert_part_id = hinge.operations[-1].id # save for later
 
-    ######################## Make web of subdesign in sheet
+    ######################## External transform the web.sheet to the construction line
 
-    # build the op_links, then auto make the operation
-    op = hinge.operations[-1]
-    op_ref = op.id # last operation is the one we want
-    op_links = {'parent': [(op_ref, op.getoutputref())]}
+    # # make design links
+    operation_links = {}
+    operation_links['from'] = [(new_web.id,1)]
 
-    # note second value has to be 0
-    new_web = AutoWeb4(op_links,[support_offset,0],popupcad.manufacturing.multivalueoperation3.MultiValueOperation3.keepout_types.laser_keepout)
-    new_web.setcustomname(op.name)
+    sketch_links = {}
+    sketch_links['sketch_to'] = [construction_geom_sheet.id]
+    sketch_links['sketch_from'] = [construction_geom_hinge.id]
 
-    hinge.addoperation(new_web)
-    new_web.generate(hinge)
-    web_id = hinge.operations[-1].id
+    insert_webs = TransformInternal(sketch_links, operation_links, 'scale', 'scale', 0, False, 1., 1.)
+    insert_webs.customname = 'Inserted part webs'
+
+    hinge.addoperation(insert_webs)
+    insert_webs.generate(hinge)
+
+
+    # ######################## Make web of subdesign in sheet
+    #
+    # # build the op_links, then auto make the operation
+    # op = hinge.operations[-1]
+    # op_ref = op.id # last operation is the one we want
+    # op_links = {'parent': [(op_ref, op.getoutputref())]}
+    #
+    # # note second value has to be 0
+    # new_web = AutoWeb4(op_links,[support_offset,0],popupcad.manufacturing.multivalueoperation3.MultiValueOperation3.keepout_types.laser_keepout)
+    # new_web.setcustomname(op.name)
+    #
+    # hinge.addoperation(new_web)
+    # new_web.generate(hinge)
+    # web_id = hinge.operations[-1].id
 
     ######################## Remove web.sheet from sheet, union external transform + generateed sheet with hole + web
     # first the difference
     # link 1 is the sheet
-    sheet_with_hole = LaminateOperation2({'unary': [(sheet.id,0)], 'binary': [(web_id,1)]},'difference')
+    sheet_with_hole = LaminateOperation2({'unary': [(sheet.id,0)], 'binary': [(insert_webs.id,0)]},'difference')
     sheet_with_hole.customname = 'Sheet with hole'
     hinge.addoperation(sheet_with_hole)
     sheet_with_hole.generate(hinge)
 
-    sheet_with_part = LaminateOperation2({'unary': [(sheet_with_hole.id,0), (web_id,0), (insert_part_id,0)],
+    sheet_with_part = LaminateOperation2({'unary': [(sheet_with_hole.id,0), (insert_part_id,0)],
                                           'binary':[]},'union')
 
     sheet_with_part.customname = 'First pass cuts'
@@ -388,12 +404,13 @@ if __name__=='__main__':
     hinge.subdesigns[layup.id] = layup
 
     subop = SubOperation2({'source': [layup.id]}, [], [],
-                          [popupcad.manufacturing.sub_operation2.OutputData((layup.operations[-1].id,0), 0)])
+                          [popupcad.manufacturing.sub_operation2.OutputData((layup.operations[-1].id,0),0)])
+    subop.setcustomname("Support layup")
     subop.generate(hinge)
     hinge.addoperation(subop)
 
     # place op the laminate
-    array_part_into_layup(hinge, subop, N = 24)
+    array_part_into_layup(hinge, subop, N = 24, x_gap = 0.1, y_gap = 0.1)
 
     ################## show the new design
     editor = popupcad.guis.editor.Editor()
