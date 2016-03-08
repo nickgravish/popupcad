@@ -125,9 +125,11 @@ if __name__=='__main__':
         loc = (-2.705,0.02)
         tmp.reprocessoperations()
 
-        # make list of hole geometry
-        holes_poly = [popupcad.filetypes.genericshapes.GenericCircle.gen_from_point_lists([(loc[0]+diam*3*(k+1),loc[1]),
-                                                                                           (loc[0]+diam*3*(k+1) + diam,loc[1])],
+        # make list of squares
+        holes_poly = [popupcad.filetypes.genericshapes.GenericPoly.gen_from_point_lists([(loc[0]+diam*3*(k+1),loc[1]),
+                                                                                         (loc[0]+diam*3*(k+1),loc[1] + diam),
+                                                                                         (loc[0]+diam*3*(k+1) + diam,loc[1] + diam),
+                                                                                         (loc[0]+diam*3*(k+1) + diam,loc[1])],
                                                                                           []) for k in range(kk+1)]
         holes.addoperationgeometries(holes_poly)
 
