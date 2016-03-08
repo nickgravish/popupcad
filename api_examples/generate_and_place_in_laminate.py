@@ -195,8 +195,15 @@ def generate_laminate(design):
     [layup.addoperation(item) for item in other_ops]
     [item.generate(layup) for item in other_ops]
 
-    return layup
+    design.subdesigns[layup.id] = layup
 
+    subop = SubOperation2({'source': [layup.id]}, [], [],
+                          [popupcad.manufacturing.sub_operation2.OutputData((layup.operations[-1].id,0),0)])
+    subop.setcustomname("Support layup")
+    subop.generate(design)
+    design.addoperation(subop)
+
+    return layup, subop
 
 def array_part_into_layup(hinge, sheet, support_offset = 0.0, N = 12, sc = 1, x_gap = 0, y_gap = 0):
 
@@ -400,14 +407,9 @@ if __name__=='__main__':
     hinge.reprocessoperations(debugprint=True)
 
     # generate laminate based on the layers in the design
-    layup = generate_laminate(hinge)
-    hinge.subdesigns[layup.id] = layup
+    layup, subop = generate_laminate(hinge)
 
-    subop = SubOperation2({'source': [layup.id]}, [], [],
-                          [popupcad.manufacturing.sub_operation2.OutputData((layup.operations[-1].id,0),0)])
-    subop.setcustomname("Support layup")
-    subop.generate(hinge)
-    hinge.addoperation(subop)
+
 
     # place op the laminate
     array_part_into_layup(hinge, subop, N = 24, x_gap = 0.1, y_gap = 0.1)
