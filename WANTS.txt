@@ -1,0 +1,20 @@
+
+hard time understanding unary or binary selection
+
+preview sketches in selector
+
+make constraint highlighting bigger
+
+constraint to maintain relative distance
+
+when constrain multiple lines to be horizontal, they are aligned and move together.
+
+recent files list
+
+way to measure distances
+
+holding shift, orhto
+
+x,y coord readout
+
+no horizontal panning

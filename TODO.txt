@@ -1,0 +1,11 @@
+
+
+Accomplished:
+
+Script that takes in hinge file and programmatically changes two geometry parameters in it then tiles a 25mmx25mm laminate with the first cuts and release cuts. It tiles the upper and lower portions making 2x12 parts in this case
+
+todo:
+fix the .gitignore to ignore more stuff
+script to tile a generic part
+incorporate this functionality into class methods of popupcad to make the scripts easier
+add to documentation
