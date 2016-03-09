@@ -9,6 +9,8 @@ import popupcad
 from popupcad.manufacturing.multivalueoperation3 import MultiValueOperation3
 from popupcad.filetypes.sketch import Sketch
 from popupcad.manufacturing.sub_operation2 import SubOperation2
+from popupcad.filetypes.laminate import Laminate
+
 import numpy as np
 from popupcad.filetypes.operationoutput import OperationOutput
 
@@ -21,7 +23,7 @@ class AlignmentLayup(MultiValueOperation3):
     def operate(self, design):
 
         """
-        Return a subop of a layup laminate with all the layers of the part and with the appropriate 25x25mm alignment
+        Return a generic_laminate ref of a layup laminate with all the layers of the part and with the appropriate 25x25mm alignment
         features compatible with the Wood lab micro-robotics manufacturing process.
 
         Input:
@@ -36,8 +38,8 @@ class AlignmentLayup(MultiValueOperation3):
         hole_offset = self.values[1]        # location of hole in from corner
         hole_rad    = self.values[2]        # alignment pin geoms
 
-        cross_len   = 1                     # tick length
-        cross_horiz = 10                    # horizontal dimension from center crosshair
+        cross_len   = .75                   # tick length
+        cross_horiz = sheet_width/2 - 2*cross_len        # horizontal dimension from center crosshair
         dt          = 0.001                 # small thickness for crosshair
 
         buff_x      = 5                     # for window sizes
@@ -46,11 +48,11 @@ class AlignmentLayup(MultiValueOperation3):
         space_x     = 1.3
 
         # window width, maximum of 1 mm
-        wind_w      = lambda N: min((sheet_width - 2*buff_x)/(N + 1.3*N - 1.3), 1)
+        wind_w      = lambda N: max(min((sheet_width - 2*buff_x)/(N + 1.3*N - 1.3), 1),0.01)
 
         # the laminate design
-        # layup = popupcad.filetypes.design.Design.new()
-        # layup.updatefilename("layup")
+        layup = popupcad.filetypes.design.Design.new()
+        layup.updatefilename("layup")
         layer_list = design.return_layer_definition().layers
         layup.define_layers(popupcad.filetypes.layerdef.LayerDef(*layer_list))
 
@@ -182,14 +184,4 @@ class AlignmentLayup(MultiValueOperation3):
         [layup.addoperation(item) for item in other_ops]
         [item.generate(layup) for item in other_ops]
 
-        # design.subdesigns[layup.id] = layup
-        #
-        # subop = SubOperation2({'source': [layup.id]}, [], [],
-        #                       [popupcad.manufacturing.sub_operation2.OutputData((layup.operations[-1].id,0),0)])
-        # subop.setcustomname("Support layup")
-        # subop.generate(design)
-        # design.addoperation(subop)
-
-        return sheet_with_windows.output[0]
-
-            # , subop
+        return sheet_with_windows.output[0].csg
