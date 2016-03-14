@@ -32,6 +32,8 @@ def build_menu_system(program):
         program.editor.newoperation(manufacturing.identifyrigidbodies2.IdentifyRigidBodies2)
     def new_alignment_layup():
         program.editor.newoperation(manufacturing.generatealignmentlayup.AlignmentLayup)
+    def new_tile_part():
+        program.editor.newoperation(manufacturing.tilepart.TilePart)
 
     action_definitions = {}
     
@@ -49,6 +51,7 @@ def build_menu_system(program):
     action_definitions['identify_bodies']={'text': 'Identify Bodies','icon': 'identifybodies'}
 
     action_definitions['alignment_layup']={'text': 'Alignment layup','icon': 'identifybodies'}
+    action_definitions['tile_part']={'text': 'Tile parts','icon': 'identifybodies'}
 
     toolbar_definitions={}
     toolbar_definitions['Scrap']={'text': 'Scrap', 'icon': 'scrap'}
@@ -62,7 +65,7 @@ def build_menu_system(program):
     menu_structure['Scrap'] = ['sheet','web','scrap']
     menu_structure['Support'] = ['support_action','custom_support']
     menu_structure['Misc'] = ['keepout','identify_rigid_bodies','removability']
-    menu_structure['Microrobotics'] = ['alignment_layup']
+    menu_structure['Microrobotics'] = ['alignment_layup', 'tile_part']
     
     toolbar_structure = menu_structure.copy()
     shortcuts = {}
@@ -78,6 +81,7 @@ def build_menu_system(program):
     triggered['removability'] = new_removability
     triggered['identify_bodies'] = new_identify_bodies
     triggered['alignment_layup'] = new_alignment_layup
+    triggered['tile_part'] = new_tile_part
 
     for key,value in triggered.items():
         action_definitions[key]['triggered'] = value    

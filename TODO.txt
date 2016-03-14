@@ -9,3 +9,10 @@ fix the .gitignore to ignore more stuff
 script to tile a generic part
 incorporate this functionality into class methods of popupcad to make the scripts easier
 add to documentation
+
+
+widget that you select the sheet, the part, and the sketch which represents the area you want to array the parts into.
+
+class error when union pin alignment sheet
+
+Help solve new challenges in microscle manipulation and exploration. Inspire new deisgn, manufacturing, and control paradigms. Address open and important questions in the biology of movement and manipulation.   

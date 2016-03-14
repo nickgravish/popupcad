@@ -100,6 +100,26 @@ class Sketch(popupCADFile):
         shapelygeoms = popupcad.algorithms.csg_shapely.unary_union_safe(shapelygeoms)
         shapelygeoms = popupcad.algorithms.csg_shapely.condition_shapely_entities(shapelygeoms)
         return shapelygeoms
+    #
+    # def getBoundingBox(self):
+    #     all_vertices = []
+    #     for op_geom in self.operationgeometry:
+    #         all_vertices.extend(op_geom.vertices().getpos())
+    #
+    #     shapes = self.geoms[layer]
+    #         zvalue = layerdef.z_values[layer]
+    #         height = float(zvalue) #* 100 #* 1/popupcad.internal_argument_scaling
+    #         if (len(shapes) == 0) : #In case there are no shapes.
+    #             continue
+    #         all_shapes.extend(shapes)
+    #     all_shapes = [shape.to_shapely() for shape in shapes]
+    #     master_shape = all_shapes[0]
+    #     for shape in all_shapes[1:]:
+    #         master_shape = master_shape.union(shape)
+    #     bounds = master_shape.bounds
+    #     bounds = [value/popupcad.csg_processing_scaling for value in bounds]
+    #     return bounds
+
 
     @classmethod
     def load_dxf(cls, filename, parent=None):

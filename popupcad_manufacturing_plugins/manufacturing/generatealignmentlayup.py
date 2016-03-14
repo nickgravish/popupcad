@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Written by Daniel M. Aukes and CONTRIBUTORS
-Email: danaukes<at>seas.harvard.edu.
+Contributed by Nick Gravish
+Email: gravish<at>seas.harvard.edu.
 Please see LICENSE for full license.
 """
 
@@ -34,6 +34,8 @@ class AlignmentLayup(MultiValueOperation3):
         subop -> A subop which is inserted into the input design file to reduce the number of operations
         """
 
+
+        #### general geometry constants that most layups will have
         sheet_width = self.values[0]        # mm
         hole_offset = self.values[1]        # location of hole in from corner
         hole_rad    = self.values[2]        # alignment pin geoms
@@ -185,3 +187,5 @@ class AlignmentLayup(MultiValueOperation3):
         [item.generate(layup) for item in other_ops]
 
         return sheet_with_windows.output[0].csg
+
+        # might need valueoperation
