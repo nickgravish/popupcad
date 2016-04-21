@@ -202,9 +202,18 @@ class Sketcher(MainGui,qg.QMainWindow):
         self.refreshconstraints()
 
     def refreshconstraints(self):
+        print("before \r")
+        print(self.sketch.operationgeometry[0].vertices())
+        print(self.sketch.constraintsystem.get_vertices)
+
         self.sketch.constraintsystem.cleanup()
         del self.sketch.constraintsystem.generator
         self.sketch.constraintsystem.update()
+
+        print("after")
+        print(self.sketch.operationgeometry[0].vertices())
+        print(self.sketch.constraintsystem.get_vertices)
+
         self.scene.updateshape()
         self.constraint_editor.refresh()
 
@@ -261,7 +270,15 @@ class Sketcher(MainGui,qg.QMainWindow):
             newitem.refreshview()
 
         self.constraint_editor.linklist(self.sketch.constraintsystem.constraints)
+
+        print('load sketch original vertices in constraint system')
+        print(self.sketch.constraintsystem.get_vertices)
+
         self.sketch.constraintsystem.get_vertices = self.get_sketch_vertices
+
+        print('after in constraint system')
+        print(self.sketch.constraintsystem.get_vertices)
+
         self.load_references()
         self.update_window_title()
         
